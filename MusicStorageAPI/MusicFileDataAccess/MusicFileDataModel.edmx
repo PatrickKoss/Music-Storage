@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="MusicStorageModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Interpret">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NAME" Type="varchar" MaxLength="30" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MusicFile">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="int" Nullable="false" />
+          <Property Name="Interpret" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Title">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NAME" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="Genre" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <Association Name="fkInterpret">
+          <End Role="Interpret" Type="Self.Interpret" Multiplicity="1" />
+          <End Role="MusicFile" Type="Self.MusicFile" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Interpret">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="MusicFile">
+              <PropertyRef Name="Interpret" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fkTitle">
+          <End Role="Title" Type="Self.Title" Multiplicity="1" />
+          <End Role="MusicFile" Type="Self.MusicFile" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Title">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="MusicFile">
+              <PropertyRef Name="Title" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MusicStorageModelStoreContainer">
+          <EntitySet Name="Interpret" EntityType="Self.Interpret" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MusicFile" EntityType="Self.MusicFile" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Title" EntityType="Self.Title" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="fkInterpret" Association="Self.fkInterpret">
+            <End Role="Interpret" EntitySet="Interpret" />
+            <End Role="MusicFile" EntitySet="MusicFile" />
+          </AssociationSet>
+          <AssociationSet Name="fkTitle" Association="Self.fkTitle">
+            <End Role="Title" EntitySet="Title" />
+            <End Role="MusicFile" EntitySet="MusicFile" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MusicStorageModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Interpret">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="MusicFile" Relationship="Self.fkInterpret" FromRole="Interpret" ToRole="MusicFile" />
+        </EntityType>
+        <EntityType Name="MusicFile">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="Int32" Nullable="false" />
+          <Property Name="Interpret" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Interpret1" Relationship="Self.fkInterpret" FromRole="MusicFile" ToRole="Interpret" />
+          <NavigationProperty Name="Title1" Relationship="Self.fkTitle" FromRole="MusicFile" ToRole="Title" />
+        </EntityType>
+        <EntityType Name="Title">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NAME" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Genre" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="MusicFile" Relationship="Self.fkTitle" FromRole="Title" ToRole="MusicFile" />
+        </EntityType>
+        <Association Name="fkInterpret">
+          <End Role="Interpret" Type="Self.Interpret" Multiplicity="1" />
+          <End Role="MusicFile" Type="Self.MusicFile" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Interpret">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="MusicFile">
+              <PropertyRef Name="Interpret" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fkTitle">
+          <End Role="Title" Type="Self.Title" Multiplicity="1" />
+          <End Role="MusicFile" Type="Self.MusicFile" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Title">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="MusicFile">
+              <PropertyRef Name="Title" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MusicFileEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Interpret" EntityType="Self.Interpret" />
+          <EntitySet Name="MusicFile" EntityType="Self.MusicFile" />
+          <EntitySet Name="Title" EntityType="Self.Title" />
+          <AssociationSet Name="fkInterpret" Association="Self.fkInterpret">
+            <End Role="Interpret" EntitySet="Interpret" />
+            <End Role="MusicFile" EntitySet="MusicFile" />
+          </AssociationSet>
+          <AssociationSet Name="fkTitle" Association="Self.fkTitle">
+            <End Role="Title" EntitySet="Title" />
+            <End Role="MusicFile" EntitySet="MusicFile" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MusicStorageModelStoreContainer" CdmEntityContainer="MusicFileEntities">
+          <EntitySetMapping Name="Interpret">
+            <EntityTypeMapping TypeName="MusicStorageModel.Interpret">
+              <MappingFragment StoreEntitySet="Interpret">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MusicFile">
+            <EntityTypeMapping TypeName="MusicStorageModel.MusicFile">
+              <MappingFragment StoreEntitySet="MusicFile">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Interpret" ColumnName="Interpret" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Title">
+            <EntityTypeMapping TypeName="MusicStorageModel.Title">
+              <MappingFragment StoreEntitySet="Title">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="Genre" ColumnName="Genre" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Kein" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
