@@ -3,16 +3,16 @@ import "core-js/features/array";
 import "core-js/features/string";
 
 // Vue framework
+import Axios from "axios";
 import Vue from "vue";
 // Vuetify UI components
-import Vuetify from "vuetify"
+import Vuetify from "vuetify";
 // Kick start the main Vue component
 import App from "./App.vue";
 // VueRouter
 import Router from "./router";
 // Vuex store
 import {AppStore} from "./store/AppStore";
-import Axios from "axios";
 
 Axios.defaults.baseURL = process.env.API_ENDPOINT;
 

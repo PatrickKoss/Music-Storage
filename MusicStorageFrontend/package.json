@@ -1,12 +1,11 @@
 {
-    "name": "ms-scenario-evaluation-frontend",
-    "description": "Frontend to manage evolvability scenarios for services",
-    "version": "0.0.9",
+    "name": "music-storage",
+    "description": "Frontend to manage music files",
+    "version": "0.0.1",
     "license": "Apache-2.0",
     "contributors": [
         {
-            "name": "Patrick Koss",
-            "email": "pati.koss@gmx.de"
+            "name": "Patrick Koss"
         }
     ],
     "scripts": {

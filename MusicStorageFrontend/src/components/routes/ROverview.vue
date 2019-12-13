@@ -7,12 +7,12 @@
           <h2>Music Files</h2>
           <v-spacer></v-spacer>
           <v-text-field
-            v-model="searchMusicFile"
-            append-icon="search"
-            label="Search"
-            single-line
-            hide-details
-            style="margin-right: 15px"
+                  v-model="searchMusicFile"
+                  append-icon="search"
+                  label="Search"
+                  single-line
+                  hide-details
+                  style="margin-right: 15px"
           ></v-text-field>
           <v-spacer></v-spacer>
           <div>
@@ -25,14 +25,14 @@
           </div>
         </v-card-title>
         <v-data-table
-          :headers="headers"
-          :items="appStore.state.musicFilesWithoutIDs"
-          :loading="appStore.state.loadingMusicFiles"
+                :headers="headers"
+                :items="appStore.state.musicFilesWithoutIDs"
+                :loading="appStore.state.loadingMusicFiles"
         >
           <v-progress-linear
-            color="blue"
-            indeterminate
-            slot="progress"
+                  color="blue"
+                  indeterminate
+                  slot="progress"
           ></v-progress-linear>
           <template slot="items" slot-scope="props">
             <td class="text-xs-left tableData">{{ props.item.Title }}</td>
@@ -47,11 +47,11 @@
                 <v-icon>edit</v-icon>
               </v-btn>
               <v-btn
-                class="ma-2"
-                tile
-                large
-                icon
-                @click="deleteItem(props.item)"
+                      class="ma-2"
+                      tile
+                      large
+                      icon
+                      @click="deleteItem(props.item)"
               >
                 <v-icon>delete</v-icon>
               </v-btn>
@@ -60,170 +60,170 @@
         </v-data-table>
       </v-card>
       <CAddMusicFileDialog
-        :dialog="openDialog"
-        v-on:closed-Dialog="closeDialog"
-        :musicFileProp="musicFile"
-        :editMode="editDialog"
+              :dialog="openDialog"
+              v-on:closed-Dialog="closeDialog"
+              :musicFileProp="musicFile"
+              :editMode="editDialog"
       ></CAddMusicFileDialog>
       <CDeleteDialog
-        :dialog="deleteDialog"
-        v-on:closed-Dialog="closeDeleteDialog"
-        :component="musicFileDelete.Title"
-        :id="musicFileDelete.ID"
-        :editMode="editDialog"
+              :dialog="deleteDialog"
+              v-on:closed-Dialog="closeDeleteDialog"
+              :component="musicFileDelete.Title"
+              :id="musicFileDelete.ID"
+              :editMode="editDialog"
       ></CDeleteDialog>
     </v-flex>
   </v-layout>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import { StateModule, AppStore } from "../../store/AppStore";
-import { VueStateField } from "../../store/State";
-import { MusicFileRestClient } from "../../model/MusicFileRestClient";
-import { IMusicFile } from "../../model/IMusicFile";
-import { Watch } from "vue-property-decorator";
-import CFilterSidebar from "../general/CFilterSidebar.vue";
-import CAddMusicFileDialog from "../general/CAddMusicFileDialog.vue";
-import { IMusicFileWithoutIDs } from "../../model/IMusicFileWithoutIDs";
-import CDeleteDialog from "../general/CDeleteDialog .vue";
+  import Vue from "vue";
+  import Component from "vue-class-component";
+  import {StateModule, AppStore} from "../../store/AppStore";
+  import {VueStateField} from "../../store/State";
+  import {MusicFileRestClient} from "../../model/MusicFileRestClient";
+  import {IMusicFile} from "../../model/IMusicFile";
+  import {Watch} from "vue-property-decorator";
+  import CFilterSidebar from "../general/CFilterSidebar.vue";
+  import CAddMusicFileDialog from "../general/CAddMusicFileDialog.vue";
+  import {IMusicFileWithoutIDs} from "../../model/IMusicFileWithoutIDs";
+  import CDeleteDialog from "../general/CDeleteDialog .vue";
 
-@Component({
-  components: { CFilterSidebar, CAddMusicFileDialog, CDeleteDialog }
-})
-export default class ROverview extends Vue {
-  @VueStateField(StateModule.GENERAL)
-  public darkeningGeneral: boolean;
+  @Component({
+    components: {CFilterSidebar, CAddMusicFileDialog, CDeleteDialog}
+  })
+  export default class ROverview extends Vue {
+    @VueStateField(StateModule.GENERAL)
+    public darkeningGeneral: boolean;
 
-  @VueStateField(StateModule.GENERAL)
-  public searchMusicFile: string;
+    @VueStateField(StateModule.GENERAL)
+    public searchMusicFile: string;
 
-  @VueStateField(StateModule.GENERAL)
-  public sortByMusicFile: string;
+    @VueStateField(StateModule.GENERAL)
+    public sortByMusicFile: string;
 
-  appStore = AppStore;
-  counterSort = 1;
-  previousSort = "title";
-  editDialog = false;
-  deleteDialog = false;
+    appStore = AppStore;
+    counterSort = 1;
+    previousSort = "title";
+    editDialog = false;
+    deleteDialog = false;
 
-  musicFile = {
-    Title: "",
-    Interpret: "",
-    Genre: "",
-    ID: null
-  } as IMusicFileWithoutIDs;
-
-  musicFileDelete = {
-    Title: "",
-    Interpret: "",
-    Genre: "",
-    ID: null
-  } as IMusicFileWithoutIDs;
-
-  headers = [
-    {
-      text: "Title",
-      align: "left",
-      value: "title",
-      sortable: true
-    },
-    { text: "Interpret", value: "interpret", sortable: true },
-    { text: "Genre", value: "genre", sortable: true },
-    { text: "Actions", value: "actions", sortable: false }
-  ];
-
-  openDialog = false;
-
-  public created() {
-    AppStore.commit("loadMusicFiles");
-  }
-
-  mounted() {
-    for (let i = 0; i < document.getElementsByTagName("th").length - 2; i++) {
-      document.getElementsByTagName("th")[i].addEventListener(
-        "click",
-        event => {
-          if (this.previousSort === this.headers[i].value) {
-            switch (this.counterSort) {
-              case 0:
-                this.sortByMusicFile = this.headers[i].value;
-                this.counterSort++;
-                break;
-              case 1:
-                this.sortByMusicFile = "-" + this.headers[i].value;
-                this.counterSort++;
-                break;
-              case 2:
-                this.sortByMusicFile = this.headers[i].value;
-                this.counterSort = 0;
-                break;
-            }
-          } else {
-            this.previousSort = this.headers[i].value;
-            this.sortByMusicFile = this.headers[i].value;
-            this.counterSort = 1;
-          }
-        },
-        true
-      );
-    }
-  }
-
-  public closeDialog(dialog) {
-    this.openDialog = dialog;
-  }
-
-  public closeDeleteDialog(dialog) {
-    this.deleteDialog = dialog;
-  }
-
-  openAddDialog() {
-    this.musicFile = {
+    musicFile = {
       Title: "",
       Interpret: "",
       Genre: "",
       ID: null
     } as IMusicFileWithoutIDs;
-    this.openDialog = true;
-    this.editDialog = false;
-  }
 
-  editItem(item: IMusicFileWithoutIDs) {
-    this.editDialog = true;
-    this.openDialog = true;
-    this.musicFile = Object.assign(item);
-  }
+    musicFileDelete = {
+      Title: "",
+      Interpret: "",
+      Genre: "",
+      ID: null
+    } as IMusicFileWithoutIDs;
 
-  deleteItem(item: IMusicFileWithoutIDs) {
-    this.deleteDialog = true;
-    this.musicFileDelete = item;
-  }
+    headers = [
+      {
+        text: "Title",
+        align: "left",
+        value: "title",
+        sortable: true
+      },
+      {text: "Interpret", value: "interpret", sortable: true},
+      {text: "Genre", value: "genre", sortable: true},
+      {text: "Actions", value: "actions", sortable: false}
+    ];
 
-  @Watch("searchMusicFile")
-  public __searchMusic() {
-    AppStore.commit("loadMusicFiles");
-  }
+    openDialog = false;
 
-  @Watch("sortByMusicFile")
-  public __sortMusic() {
-    AppStore.commit("loadMusicFiles");
+    public created() {
+      AppStore.commit("loadMusicFiles");
+    }
+
+    mounted() {
+      for (let i = 0; i < document.getElementsByTagName("th").length - 2; i++) {
+        document.getElementsByTagName("th")[i].addEventListener(
+          "click",
+          event => {
+            if (this.previousSort === this.headers[i].value) {
+              switch (this.counterSort) {
+                case 0:
+                  this.sortByMusicFile = this.headers[i].value;
+                  this.counterSort++;
+                  break;
+                case 1:
+                  this.sortByMusicFile = "-" + this.headers[i].value;
+                  this.counterSort++;
+                  break;
+                case 2:
+                  this.sortByMusicFile = this.headers[i].value;
+                  this.counterSort = 0;
+                  break;
+              }
+            } else {
+              this.previousSort = this.headers[i].value;
+              this.sortByMusicFile = this.headers[i].value;
+              this.counterSort = 1;
+            }
+          },
+          true
+        );
+      }
+    }
+
+    public closeDialog(dialog) {
+      this.openDialog = dialog;
+    }
+
+    public closeDeleteDialog(dialog) {
+      this.deleteDialog = dialog;
+    }
+
+    openAddDialog() {
+      this.musicFile = {
+        Title: "",
+        Interpret: "",
+        Genre: "",
+        ID: null
+      } as IMusicFileWithoutIDs;
+      this.openDialog = true;
+      this.editDialog = false;
+    }
+
+    editItem(item: IMusicFileWithoutIDs) {
+      this.editDialog = true;
+      this.openDialog = true;
+      this.musicFile = Object.assign(item);
+    }
+
+    deleteItem(item: IMusicFileWithoutIDs) {
+      this.deleteDialog = true;
+      this.musicFileDelete = item;
+    }
+
+    @Watch("searchMusicFile")
+    public __searchMusic() {
+      AppStore.commit("loadMusicFiles");
+    }
+
+    @Watch("sortByMusicFile")
+    public __sortMusic() {
+      AppStore.commit("loadMusicFiles");
+    }
   }
-}
 </script>
 
 <style scoped>
-#root {
-  min-height: 100vh;
-  height: 100%;
-}
-.tableData {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
+  #root {
+    height: 100%;
+  }
+
+  .tableData {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 </style>

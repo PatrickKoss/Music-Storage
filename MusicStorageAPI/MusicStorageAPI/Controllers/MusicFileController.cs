@@ -175,6 +175,11 @@ namespace MusicStorageAPI.Controllers
                 using (MusicFileEntities entites = new MusicFileEntities())
                 {
                     Models.MusicFileJson musicFile = new Models.MusicFileJson(Request.Content.ReadAsStringAsync().Result);
+                    // check if the genre is valid
+                    if (!(musicFile.Genre == "Pop" || musicFile.Genre == "Rock" || musicFile.Genre == "Dance" || musicFile.Genre == "Latin"))
+                    {
+                        return Ok("Not a correct genre");
+                    }
                     //System.Diagnostics.Debug.WriteLine(musicFile.Title.Name);
                     var join = (from m in entites.MusicFile
                                 join title in entites.Title
@@ -196,7 +201,7 @@ namespace MusicStorageAPI.Controllers
                         {
                             ID = i.ID,
                             Name = i.NAME
-                        }).SingleOrDefault(i => i.Name == musicFile.Title.Name);
+                        }).OrderByDescending(t => t.ID).FirstOrDefault(i => i.Name == musicFile.Title.Name);
                         System.Diagnostics.Debug.WriteLine(createdTitle.ID);
 
                         // if the interpret is not in the database, create a new interpret
@@ -276,8 +281,16 @@ namespace MusicStorageAPI.Controllers
             {
                 using (MusicFileEntities entites = new MusicFileEntities())
                 {
-                    System.Diagnostics.Debug.WriteLine("Update");
                     Models.MusicFileJson musicFile = new Models.MusicFileJson(Request.Content.ReadAsStringAsync().Result);
+                    // check if the genre is valid
+                    if (!(musicFile.Genre == "Pop" || musicFile.Genre == "Rock" || musicFile.Genre == "Dance" || musicFile.Genre == "Latin"))
+                    {
+                        return Ok("Not a correct genre");
+                    }
+                    var join = (from m in entites.MusicFile
+                                join title in entites.Title
+                                on m.Title equals title.ID
+                                select new { ID = m.ID, Title = new Models.TitleDTO { ID = title.ID, Name = title.NAME }, Interpret = m.Interpret, Genre = title.Genre });
 
                     // check if the interpret already exists in the database
                     var preInterpret = entites.Interpret.FirstOrDefault(i => i.NAME == musicFile.Interpret.Name);
@@ -286,6 +299,12 @@ namespace MusicStorageAPI.Controllers
                     {
                         createdInterpret.ID = preInterpret.ID;
                         createdInterpret.Name = preInterpret.NAME;
+                        // check if the interpret already has a title named like the musicfile
+                        var tempTitle = join.FirstOrDefault(m => m.Interpret == createdInterpret.ID && m.Title.Name == musicFile.Title.Name && m.Title.ID != musicFile.Title.ID);
+                        if (tempTitle != null)
+                        {
+                            return Ok("The interpret " + createdInterpret.Name + " has already a title named like " + musicFile.Title.Name);
+                        }
                     } else
                     {
                         //create new interpret
