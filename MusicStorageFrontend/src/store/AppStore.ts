@@ -1,11 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { GeneralState } from "./states/GeneralState";
 import IFilterMusicFile from "../model/IFilterMusicFile";
-import { MusicFileRestClient } from "../model/MusicFileRestClient";
+import IInterpret from "../model/IInterpret";
 import { IMusicFile } from "../model/IMusicFile";
 import { IMusicFileWithoutIDs } from "../model/IMusicFileWithoutIDs";
-import IInterpret from "../model/IInterpret";
+import { MusicFileRestClient } from "../model/MusicFileRestClient";
+import { GeneralState } from "./states/GeneralState";
 
 Vue.use(Vuex);
 
@@ -25,7 +25,7 @@ export const AppStore = new Vuex.Store({
      * MYMODULE : new MyModule().state
      */
     modules: {
-        GENERAL: new GeneralState().state,
+        GENERAL: new GeneralState().state
     },
 
     /**
@@ -35,12 +35,15 @@ export const AppStore = new Vuex.Store({
     state: {
         filterMusicFile: {
             genre: "",
-            interpret: "",
+            interpret: ""
         } as IFilterMusicFile,
         musicFiles: Array<IMusicFile>(),
         musicFilesWithoutIDs: Array<IMusicFileWithoutIDs>(),
+        // tslint:disable-next-line:object-literal-sort-keys
         loadingMusicFiles: false,
+        // tslint:disable-next-line:ban-types
         interprets: Array<String>(),
+        interpret: {Name: "", ID: 0} as IInterpret
     },
 
     /**
@@ -52,7 +55,7 @@ export const AppStore = new Vuex.Store({
         },
         async loadMusicFiles(state) {
             state.loadingMusicFiles = true;
-            let data: Array<IMusicFile> = (await MusicFileRestClient.getMusicFiles())
+            const data: IMusicFile[] = (await MusicFileRestClient.getMusicFiles())
             .data;
             state.musicFiles = data;
             state.musicFilesWithoutIDs = Array<IMusicFileWithoutIDs>();
@@ -60,6 +63,7 @@ export const AppStore = new Vuex.Store({
                 state.musicFilesWithoutIDs.push({
                     ID: musicFile.ID,
                     Title: musicFile.Title.Name,
+                    // tslint:disable-next-line:object-literal-sort-keys
                     Interpret: musicFile.Interpret.Name,
                     Genre: musicFile.Genre
                 } as IMusicFileWithoutIDs);
@@ -67,19 +71,24 @@ export const AppStore = new Vuex.Store({
             state.loadingMusicFiles = false;
         },
         async loadInterprets(state) {
-            let data: Array<IInterpret> = (await MusicFileRestClient.getInterprets())
+            const data: IInterpret[] = (await MusicFileRestClient.getInterprets())
             .data;
-            state.interprets = Array<string>()
-            data.forEach(interpret => {
+            state.interprets = Array<string>();
+            data.forEach((interpret) => {
                 state.interprets.push(interpret.Name);
             });
         },
         resetFilterMusicFile(state) {
             state.filterMusicFile = {
                 genre: "",
-                interpret: "",
-            } as IFilterMusicFile
+                interpret: ""
+            } as IFilterMusicFile;
         },
+        async loadInterpret(state, id: number) {
+            state.interpret = (await MusicFileRestClient.getInterpret(id))
+              .data;
+            state.filterMusicFile.interpret = state.interpret.Name.toString();
+        }
     }
 });
 
@@ -105,7 +114,7 @@ export function ClassStateField(namespace: StateModule, fieldName?: string) {
             return AppStore.getters[keyName];
         };
 
-        const setter = value => {
+        const setter = (value) => {
             AppStore.commit(keyName, value);
         };
 

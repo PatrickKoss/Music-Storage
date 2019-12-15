@@ -7,12 +7,12 @@
 
         <v-card-text>Do you really want to delete {{ component }}?</v-card-text>
 
-        <v-divider></v-divider>
+        <v-divider/>
 
         <v-card-actions>
           <v-btn @click="dialogD = false" flat>Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn @click="deleteComponent()" color="primary" flat>Delete </v-btn>
+          <v-spacer/>
+          <v-btn @click="deleteTitle()" color="primary" flat>Delete </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -41,11 +41,18 @@ export default class CDeleteDialog extends Vue {
   @Prop() public dialog: boolean;
   @Prop() public id: number;
   @Prop() component: string;
+  @Prop() public interpretMode: boolean;
   public dialogD: boolean = this.dialog;
   helper: any = new HelperFunctions();
 
-  async deleteComponent() {
-    const text = (await MusicFileRestClient.deleteMusicFile(this.id)).data;
+  async deleteTitle() {
+    let text = "";
+    if (!this.interpretMode) {
+      text = (await MusicFileRestClient.deleteMusicFile(this.id)).data;
+    } else {
+      text = (await MusicFileRestClient.deleteInterpret(this.id)).data;
+      await this.$router.replace("/");
+    }
     this.helper.showError(text, this.timeout, false);
     this.dialogD = false;
     AppStore.commit("loadMusicFiles");

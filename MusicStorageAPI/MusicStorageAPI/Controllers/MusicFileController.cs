@@ -248,7 +248,7 @@ namespace MusicStorageAPI.Controllers
             try
             {
                 if (id <= 0)
-                    return BadRequest("Not a valid student id");
+                    return BadRequest("Not a valid id");
 
                 using (MusicFileEntities entites = new MusicFileEntities())
                 {

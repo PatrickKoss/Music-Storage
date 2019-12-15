@@ -15,38 +15,39 @@
           <form ref="form">
             <v-layout row wrap>
               <v-text-field
-                v-model="musicFile.Title"
-                label="Title"
-                ref="title"
-                :error-messages="errorsTitle"
-              ></v-text-field>
+                      v-model="musicFile.Title"
+                      label="Title"
+                      ref="title"
+                      :error-messages="errorsTitle"
+              />
             </v-layout>
             <v-layout row wrap>
               <v-combobox
-                v-model="musicFile.Interpret"
-                :items="appStore.state.interprets"
-                label="Select an interpret or create new one"
-                :error-messages="errorsInterpret"
-                ref="interpret"
-              ></v-combobox>
+                      v-model="musicFile.Interpret"
+                      :items="appStore.state.interprets"
+                      label="Select an interpret or create new one"
+                      :error-messages="errorsInterpret"
+                      ref="interpret"
+                      :readonly="interpretMode"
+              />
             </v-layout>
             <v-layout row wrap>
               <v-select
-                v-model="musicFile.Genre"
-                label="Select genre"
-                :items="genre"
-                :error-messages="errorsGenre"
-                ref="genre"
-              ></v-select>
+                      v-model="musicFile.Genre"
+                      label="Select genre"
+                      :items="genre"
+                      :error-messages="errorsGenre"
+                      ref="genre"
+              />
             </v-layout>
           </form>
         </v-card-text>
 
-        <v-divider></v-divider>
+        <v-divider/>
 
         <v-card-actions>
           <v-btn @click="cancel()" flat>Cancel</v-btn>
-          <v-spacer></v-spacer>
+          <v-spacer/>
           <v-btn @click="addMusicFile()" color="primary" flat v-if="!editMode"
             >Add music file
           </v-btn>
@@ -87,6 +88,8 @@ export default class CAddMusicFileDialog extends Vue {
   @Prop() public dialog: boolean;
   @Prop() public editMode: boolean;
   @Prop() public musicFileProp: IMusicFileWithoutIDs;
+  @Prop() public interpretMode: boolean;
+
   firstValidate = false;
 
   appStore = AppStore;

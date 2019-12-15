@@ -4,8 +4,8 @@
     <v-flex>
       <v-card :dark="darkeningGeneral">
         <v-card-title>
-          <h2>Music Files</h2>
-          <v-spacer></v-spacer>
+          <h2>{{appStore.state.interpret.Name}}</h2>
+          <v-spacer/>
           <v-text-field
                   v-model="searchMusicFile"
                   append-icon="search"
@@ -14,13 +14,21 @@
                   hide-details
                   style="margin-right: 15px"
           />
-          <v-spacer></v-spacer>
+          <v-spacer/>
           <div>
             <v-layout row wrap>
               <v-btn class="ma-2" tile large icon @click="openAddDialog()">
                 <v-icon>add</v-icon>
               </v-btn>
-              <CFilterSidebar/>
+              <v-btn
+                      class="ma-2"
+                      tile
+                      large
+                      icon
+                      @click="deleteInterpret()"
+              >
+                <v-icon>delete</v-icon>
+              </v-btn>
             </v-layout>
           </div>
         </v-card-title>
@@ -36,8 +44,8 @@
           />
           <template slot="items" slot-scope="props">
             <td class="text-xs-left tableData">{{ props.item.Title }}</td>
-            <td class="text-xs-left tableData" @click="navigateToInterpretDetails(props.item.Interpret)">
-              <a>{{ props.item.Interpret }}</a>
+            <td class="text-xs-left tableData">
+              {{ props.item.Interpret }}
             </td>
             <td class="text-xs-left tableData">
               {{ props.item.Genre }}
@@ -64,14 +72,22 @@
               v-on:closed-Dialog="closeDialog"
               :musicFileProp="musicFile"
               :editMode="editDialog"
-              :interpretMode="false"
+              :interpretMode="true"
       />
       <CDeleteDialog
               :dialog="deleteDialog"
               v-on:closed-Dialog="closeDeleteDialog"
               :component="musicFileDelete.Title"
               :id="musicFileDelete.ID"
+              :editMode="editDialog"
               :interpretMode="false"
+      />
+      <CDeleteDialog
+              :dialog="deleteDialogInterpret"
+              v-on:closed-Dialog="closeDeleteDialogInterpret"
+              :component="appStore.state.interpret.Name"
+              :id="appStore.state.interpret.ID"
+              :interpretMode="true"
       />
     </v-flex>
   </v-layout>
@@ -91,7 +107,7 @@
   @Component({
     components: {CFilterSidebar, CAddMusicFileDialog, CDeleteDialog}
   })
-  export default class ROverview extends Vue {
+  export default class RInterpretsDetail extends Vue {
     @VueStateField(StateModule.GENERAL)
     public darkeningGeneral: boolean;
 
@@ -106,6 +122,7 @@
     previousSort = "title";
     editDialog = false;
     deleteDialog = false;
+    deleteDialogInterpret = false;
 
     musicFile = {
       Title: "",
@@ -136,7 +153,7 @@
     openDialog = false;
 
     public created() {
-      AppStore.commit("loadMusicFiles");
+      AppStore.commit("loadInterpret", this.$route.params.id);
     }
 
     mounted() {
@@ -178,10 +195,14 @@
       this.deleteDialog = dialog;
     }
 
+    public closeDeleteDialogInterpret(dialog) {
+      this.deleteDialogInterpret = dialog;
+    }
+
     openAddDialog() {
       this.musicFile = {
         Title: "",
-        Interpret: "",
+        Interpret: AppStore.state.interpret.Name.toString(),
         Genre: "",
         ID: null
       } as IMusicFileWithoutIDs;
@@ -200,10 +221,8 @@
       this.musicFileDelete = item;
     }
 
-    navigateToInterpretDetails(interpretName: string) {
-      const id = (AppStore.state.musicFiles.find(m => m.Interpret.Name === interpretName)).Interpret.ID;
-      this.$router.push("/interprets/" + id);
-      //this.$router.replace("/interprets/" + id)
+    deleteInterpret() {
+      this.deleteDialogInterpret = true;
     }
 
     @Watch("searchMusicFile")
@@ -214,6 +233,15 @@
     @Watch("sortByMusicFile")
     public __sortMusic() {
       AppStore.commit("loadMusicFiles");
+    }
+
+    @Watch("appStore.state.filterMusicFile", { immediate: true, deep: true })
+    public __loadMusicFiles() {
+      AppStore.commit("loadMusicFiles");
+    }
+
+    beforeDestroy() {
+      AppStore.commit("resetFilterMusicFile");
     }
   }
 </script>

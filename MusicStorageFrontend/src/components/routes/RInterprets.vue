@@ -36,8 +36,8 @@
           />
           <template slot="items" slot-scope="props">
             <td class="text-xs-left tableData">{{ props.item.Title }}</td>
-            <td class="text-xs-left tableData" @click="navigateToInterpretDetails(props.item.Interpret)">
-              <a>{{ props.item.Interpret }}</a>
+            <td class="text-xs-left tableData">
+              {{ props.item.Interpret }}
             </td>
             <td class="text-xs-left tableData">
               {{ props.item.Genre }}
@@ -64,14 +64,13 @@
               v-on:closed-Dialog="closeDialog"
               :musicFileProp="musicFile"
               :editMode="editDialog"
-              :interpretMode="false"
       />
       <CDeleteDialog
               :dialog="deleteDialog"
               v-on:closed-Dialog="closeDeleteDialog"
               :component="musicFileDelete.Title"
               :id="musicFileDelete.ID"
-              :interpretMode="false"
+              :editMode="editDialog"
       />
     </v-flex>
   </v-layout>
@@ -82,6 +81,8 @@
   import Component from "vue-class-component";
   import {StateModule, AppStore} from "../../store/AppStore";
   import {VueStateField} from "../../store/State";
+  import {MusicFileRestClient} from "../../model/MusicFileRestClient";
+  import {IMusicFile} from "../../model/IMusicFile";
   import {Watch} from "vue-property-decorator";
   import CFilterSidebar from "../general/CFilterSidebar.vue";
   import CAddMusicFileDialog from "../general/CAddMusicFileDialog.vue";
@@ -91,7 +92,7 @@
   @Component({
     components: {CFilterSidebar, CAddMusicFileDialog, CDeleteDialog}
   })
-  export default class ROverview extends Vue {
+  export default class RInterprets extends Vue {
     @VueStateField(StateModule.GENERAL)
     public darkeningGeneral: boolean;
 
@@ -198,12 +199,6 @@
     deleteItem(item: IMusicFileWithoutIDs) {
       this.deleteDialog = true;
       this.musicFileDelete = item;
-    }
-
-    navigateToInterpretDetails(interpretName: string) {
-      const id = (AppStore.state.musicFiles.find(m => m.Interpret.Name === interpretName)).Interpret.ID;
-      this.$router.push("/interprets/" + id);
-      //this.$router.replace("/interprets/" + id)
     }
 
     @Watch("searchMusicFile")

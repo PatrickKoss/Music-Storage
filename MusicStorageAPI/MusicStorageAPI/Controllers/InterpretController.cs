@@ -97,5 +97,49 @@ namespace MusicStorageAPI.Controllers
                 }).SingleOrDefault(i => i.ID == id);
             }
         }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public IHttpActionResult Delete(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                    return BadRequest("Not a valid id");
+
+                using (InterpretEntities entites = new InterpretEntities())
+                {
+                    var join = (from m in entites.MusicFile
+                                join title in entites.Title
+                                on m.Title equals title.ID
+                                select new { ID = m.ID, Title = new Models.TitleDTO { ID = title.ID, Name = title.NAME }, Interpret = m.Interpret, Genre = title.Genre });
+                    var interprets = (join.Where(m => m.Interpret == id)).ToList();
+
+                    // delete all music files with the given interpret id
+                    interprets.ForEach(interpret =>
+                    {
+                        entites.MusicFile.Remove(entites.MusicFile.FirstOrDefault(m => m.ID == interpret.ID));
+                        entites.SaveChanges();
+                    });
+
+                    // delete all titles for the given interpret
+                    interprets.ForEach(interpret =>
+                    {
+                        entites.Title.Remove(entites.Title.FirstOrDefault(t => t.ID == interpret.Title.ID));
+                        entites.SaveChanges();
+                    });
+
+                    // delete the interpret
+                    entites.Interpret.Remove(entites.Interpret.FirstOrDefault(i => i.ID == id));
+                    entites.SaveChanges();
+
+                    return Ok("Interpret was successfully deleted!");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
     }
 }
