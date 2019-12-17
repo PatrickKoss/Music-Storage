@@ -43,7 +43,9 @@ export const AppStore = new Vuex.Store({
         loadingMusicFiles: false,
         // tslint:disable-next-line:ban-types
         interprets: Array<String>(),
-        interpret: {Name: "", ID: 0} as IInterpret
+        interpret: {Name: "", ID: 0} as IInterpret,
+        loadInterprets: false,
+        interpretsWithID: Array<IInterpret>()
     },
 
     /**
@@ -71,12 +73,16 @@ export const AppStore = new Vuex.Store({
             state.loadingMusicFiles = false;
         },
         async loadInterprets(state) {
+            state.loadInterprets = true;
             const data: IInterpret[] = (await MusicFileRestClient.getInterprets())
             .data;
             state.interprets = Array<string>();
+            state.interpretsWithID = Array<IInterpret>();
             data.forEach((interpret) => {
                 state.interprets.push(interpret.Name);
+                state.interpretsWithID.push(interpret);
             });
+            state.loadInterprets = false;
         },
         resetFilterMusicFile(state) {
             state.filterMusicFile = {

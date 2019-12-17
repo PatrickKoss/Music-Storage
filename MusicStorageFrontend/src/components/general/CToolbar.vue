@@ -3,6 +3,11 @@
     <!-- this component creates the toolbar -->
     <v-toolbar-title justify-center>Music Storage</v-toolbar-title>
     <v-spacer></v-spacer>
+    <v-toolbar-items>
+      <v-btn text @click="navigateToMusicFiles()">Music Files</v-btn>
+      <v-btn text @click="navigateToInterprets()">Interprets</v-btn>
+    </v-toolbar-items>
+    <v-spacer></v-spacer>
     <v-menu :dark="darkeningGeneral" bottom="bottom" left="left" offset-y="offset-y" open-on-hover="open-on-hover">
       <v-btn icon large slot="activator">
         <v-avatar size="32px" tile>
@@ -74,6 +79,14 @@
         this.theme = "Light";
         this.themeSwitch = false;
       }
+    }
+
+    navigateToMusicFiles() {
+      if (this.$route.path !== "/") this.$router.push("/");
+    }
+
+    navigateToInterprets() {
+      if (this.$route.path !== "/interprets") this.$router.push("/interprets");
     }
   }
 </script>

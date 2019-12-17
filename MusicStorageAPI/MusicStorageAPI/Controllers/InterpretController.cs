@@ -141,5 +141,78 @@ namespace MusicStorageAPI.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpPost]
+        [Route("")]
+        public IHttpActionResult Post()
+        {
+            try
+            {
+                using (InterpretEntities entites = new InterpretEntities())
+                {
+                    Models.InterpretJSON interpret = new Models.InterpretJSON(Request.Content.ReadAsStringAsync().Result);
+
+                    // check if the interpret is already in the database 
+                    var element = entites.Interpret.FirstOrDefault(i => i.NAME == interpret.Name);
+                    if (element == null)
+                    {
+                        // create the interpret
+                        InterpretDataAccess.Interpret createdInterpret = new InterpretDataAccess.Interpret();
+                        createdInterpret.NAME = interpret.Name;
+                        entites.Interpret.Add(createdInterpret);
+                        entites.SaveChanges();
+
+                        // return success message
+                        return Ok("Interpret successfully created!");
+                    }
+                    else
+                    {
+                        return Ok("Interpret already exists");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public IHttpActionResult Put()
+        {
+            try
+            {
+                using (InterpretEntities entites = new InterpretEntities())
+                {
+                    Models.InterpretJSON interpret = new Models.InterpretJSON(Request.Content.ReadAsStringAsync().Result);
+
+                    // check if the interpret is in the database
+                    var existingInterpret = entites.Interpret.FirstOrDefault(i => i.ID == interpret.ID);
+                    if (existingInterpret != null)
+                    {
+                        // check if another interpret in the database has the same name
+                        var element = entites.Interpret.FirstOrDefault(i => i.ID != interpret.ID && i.NAME == interpret.Name);
+                        if (element == null)
+                        {
+                            existingInterpret.NAME = interpret.Name;
+                            entites.SaveChanges();
+                        } else
+                        {
+                            return Ok("An interpret with the same name already exists.");
+                        }
+                    } else
+                    {
+                        return Ok("Cant´t edit the interpret since it doesn´t exist in the database");
+                    }
+
+                    return Ok("Interpret successfully updated!");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

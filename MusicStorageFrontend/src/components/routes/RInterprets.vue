@@ -4,10 +4,10 @@
     <v-flex>
       <v-card :dark="darkeningGeneral">
         <v-card-title>
-          <h2>Music Files</h2>
+          <h2>Interprets</h2>
           <v-spacer></v-spacer>
           <v-text-field
-                  v-model="searchMusicFile"
+                  v-model="searchInterpret"
                   append-icon="search"
                   label="Search"
                   single-line
@@ -20,14 +20,13 @@
               <v-btn class="ma-2" tile large icon @click="openAddDialog()">
                 <v-icon>add</v-icon>
               </v-btn>
-              <CFilterSidebar/>
             </v-layout>
           </div>
         </v-card-title>
         <v-data-table
                 :headers="headers"
-                :items="appStore.state.musicFilesWithoutIDs"
-                :loading="appStore.state.loadingMusicFiles"
+                :items="appStore.state.interpretsWithID"
+                :loading="appStore.state.loadInterprets"
         >
           <v-progress-linear
                   color="blue"
@@ -35,13 +34,8 @@
                   slot="progress"
           />
           <template slot="items" slot-scope="props">
-            <td class="text-xs-left tableData">{{ props.item.Title }}</td>
-            <td class="text-xs-left tableData">
-              {{ props.item.Interpret }}
-            </td>
-            <td class="text-xs-left tableData">
-              {{ props.item.Genre }}
-            </td>
+            <td class="text-xs-left tableData" @click="navigateToInterpretDetails(props.item)"><a>{{
+              props.item.Name }}</a></td>
             <td class="text-xs-left tableData">
               <v-btn class="ma-2" tile large icon @click="editItem(props.item)">
                 <v-icon>edit</v-icon>
@@ -59,18 +53,18 @@
           </template>
         </v-data-table>
       </v-card>
-      <CAddMusicFileDialog
+      <CAddInterpretDialog
               :dialog="openDialog"
               v-on:closed-Dialog="closeDialog"
-              :musicFileProp="musicFile"
+              :interpretProp="interpret"
               :editMode="editDialog"
       />
       <CDeleteDialog
               :dialog="deleteDialog"
               v-on:closed-Dialog="closeDeleteDialog"
-              :component="musicFileDelete.Title"
-              :id="musicFileDelete.ID"
-              :editMode="editDialog"
+              :component="interpretDelete.Name"
+              :id="interpretDelete.ID"
+              :interpretMode="true"
       />
     </v-flex>
   </v-layout>
@@ -81,63 +75,54 @@
   import Component from "vue-class-component";
   import {StateModule, AppStore} from "../../store/AppStore";
   import {VueStateField} from "../../store/State";
-  import {MusicFileRestClient} from "../../model/MusicFileRestClient";
-  import {IMusicFile} from "../../model/IMusicFile";
   import {Watch} from "vue-property-decorator";
-  import CFilterSidebar from "../general/CFilterSidebar.vue";
-  import CAddMusicFileDialog from "../general/CAddMusicFileDialog.vue";
-  import {IMusicFileWithoutIDs} from "../../model/IMusicFileWithoutIDs";
   import CDeleteDialog from "../general/CDeleteDialog .vue";
+  import IInterpret from "../../model/IInterpret";
+  import CAddInterpretDialog from "../general/CAddInterpretDialog.vue";
 
   @Component({
-    components: {CFilterSidebar, CAddMusicFileDialog, CDeleteDialog}
+    components: {CDeleteDialog, CAddInterpretDialog}
   })
   export default class RInterprets extends Vue {
     @VueStateField(StateModule.GENERAL)
     public darkeningGeneral: boolean;
 
     @VueStateField(StateModule.GENERAL)
-    public searchMusicFile: string;
+    public searchInterpret: string;
 
     @VueStateField(StateModule.GENERAL)
-    public sortByMusicFile: string;
+    public sortByInterpret: string;
 
     appStore = AppStore;
     counterSort = 1;
-    previousSort = "title";
+    previousSort = "name";
     editDialog = false;
     deleteDialog = false;
 
-    musicFile = {
-      Title: "",
-      Interpret: "",
-      Genre: "",
+    interpret = {
+      Name: "",
       ID: null
-    } as IMusicFileWithoutIDs;
+    } as IInterpret;
 
-    musicFileDelete = {
-      Title: "",
-      Interpret: "",
-      Genre: "",
+    interpretDelete = {
+      Name: "",
       ID: null
-    } as IMusicFileWithoutIDs;
+    } as IInterpret;
 
     headers = [
       {
-        text: "Title",
+        text: "Name",
         align: "left",
-        value: "title",
+        value: "name",
         sortable: true
       },
-      {text: "Interpret", value: "interpret", sortable: true},
-      {text: "Genre", value: "genre", sortable: true},
       {text: "Actions", value: "actions", sortable: false}
     ];
 
     openDialog = false;
 
     public created() {
-      AppStore.commit("loadMusicFiles");
+      AppStore.commit("loadInterprets");
     }
 
     mounted() {
@@ -148,21 +133,21 @@
             if (this.previousSort === this.headers[i].value) {
               switch (this.counterSort) {
                 case 0:
-                  this.sortByMusicFile = this.headers[i].value;
+                  this.sortByInterpret = this.headers[i].value;
                   this.counterSort++;
                   break;
                 case 1:
-                  this.sortByMusicFile = "-" + this.headers[i].value;
+                  this.sortByInterpret = "-" + this.headers[i].value;
                   this.counterSort++;
                   break;
                 case 2:
-                  this.sortByMusicFile = this.headers[i].value;
+                  this.sortByInterpret = this.headers[i].value;
                   this.counterSort = 0;
                   break;
               }
             } else {
               this.previousSort = this.headers[i].value;
-              this.sortByMusicFile = this.headers[i].value;
+              this.sortByInterpret = this.headers[i].value;
               this.counterSort = 1;
             }
           },
@@ -180,35 +165,42 @@
     }
 
     openAddDialog() {
-      this.musicFile = {
-        Title: "",
-        Interpret: "",
-        Genre: "",
+      this.interpret = {
+        Name: "",
         ID: null
-      } as IMusicFileWithoutIDs;
+      } as IInterpret;
       this.openDialog = true;
       this.editDialog = false;
     }
 
-    editItem(item: IMusicFileWithoutIDs) {
+    editItem(item: IInterpret) {
       this.editDialog = true;
       this.openDialog = true;
-      this.musicFile = Object.assign(item);
+      this.interpret = Object.assign(item);
     }
 
-    deleteItem(item: IMusicFileWithoutIDs) {
+    deleteItem(item: IInterpret) {
       this.deleteDialog = true;
-      this.musicFileDelete = item;
+      this.interpretDelete = item;
     }
 
-    @Watch("searchMusicFile")
+    navigateToInterpretDetails(interpret: IInterpret) {
+      this.$router.push("/interprets/" + interpret.ID);
+    }
+
+    @Watch("searchInterpret")
     public __searchMusic() {
-      AppStore.commit("loadMusicFiles");
+      AppStore.commit("loadInterprets");
     }
 
-    @Watch("sortByMusicFile")
+    @Watch("sortByInterpret")
     public __sortMusic() {
-      AppStore.commit("loadMusicFiles");
+      AppStore.commit("loadInterprets");
+    }
+
+    beforeDestroy() {
+      this.searchInterpret = "";
+      this.sortByInterpret = "name";
     }
   }
 </script>

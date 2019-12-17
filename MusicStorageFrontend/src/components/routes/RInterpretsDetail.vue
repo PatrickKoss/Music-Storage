@@ -4,6 +4,15 @@
     <v-flex>
       <v-card :dark="darkeningGeneral">
         <v-card-title>
+          <v-btn
+                  class="ma-2"
+                  tile
+                  large
+                  icon
+                  @click="backToPreviousRoute()"
+          >
+            <v-icon>keyboard_backspace</v-icon>
+          </v-btn>
           <h2>{{appStore.state.interpret.Name}}</h2>
           <v-spacer/>
           <v-text-field
@@ -123,6 +132,7 @@
     editDialog = false;
     deleteDialog = false;
     deleteDialogInterpret = false;
+    prevRoute = null;
 
     musicFile = {
       Title: "",
@@ -223,6 +233,10 @@
 
     deleteInterpret() {
       this.deleteDialogInterpret = true;
+    }
+
+    backToPreviousRoute() {
+      this.$router.go(-1);
     }
 
     @Watch("searchMusicFile")

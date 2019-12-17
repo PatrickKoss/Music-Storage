@@ -172,6 +172,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\InterpretDTO.cs" />
+    <Compile Include="Models\InterpretJSON.cs" />
     <Compile Include="Models\MusicFileDTO.cs" />
     <Compile Include="Models\MusicFileJson.cs" />
     <Compile Include="Models\MusicFileWithoutIDsDTO.cs" />

@@ -203,7 +203,6 @@
     navigateToInterpretDetails(interpretName: string) {
       const id = (AppStore.state.musicFiles.find(m => m.Interpret.Name === interpretName)).Interpret.ID;
       this.$router.push("/interprets/" + id);
-      //this.$router.replace("/interprets/" + id)
     }
 
     @Watch("searchMusicFile")

@@ -15,5 +15,7 @@ export class GeneralState extends State {
     public static loadData: boolean = false;
     public static errorBool: boolean = false;
     public static searchMusicFile: string = "";
-    public static sortByMusicFile: String = "title";
+    public static sortByMusicFile: string = "title";
+    public static sortByInterpret: string = "name";
+    public static searchInterpret: string = "";
 }

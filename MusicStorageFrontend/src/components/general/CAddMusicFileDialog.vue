@@ -165,11 +165,11 @@ export default class CAddMusicFileDialog extends Vue {
             Interpret: { ID: -1, Name: "" },
             Genre: ""
           } as IMusicFile;
-          let index = AppStore.state.musicFiles.findIndex(
-            element => element.Interpret.Name === this.musicFile.Interpret
+          let index = AppStore.state.interpretsWithID.findIndex(
+            element => element.Name === this.musicFile.Interpret
           );
           if (index !== -1) {
-            musicFile.Interpret = AppStore.state.musicFiles[index].Interpret;
+            musicFile.Interpret = AppStore.state.interpretsWithID[index];
           } else {
             musicFile.Interpret.Name = this.musicFile.Interpret;
           }

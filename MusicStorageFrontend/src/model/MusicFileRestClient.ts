@@ -1,8 +1,10 @@
 import axios from "axios";
 import { config } from "../config";
 import { AppStore, ClassStateField, StateModule } from "../store/AppStore";
+import {VueStateField} from "../store/State";
 import IFilterMusicFile from "./IFilterMusicFile";
 import { IMusicFile } from "./IMusicFile";
+import IInterpret from "./IInterpret";
 
 export abstract class MusicFileRestClient {
   @ClassStateField(StateModule.GENERAL)
@@ -10,6 +12,12 @@ export abstract class MusicFileRestClient {
 
   @ClassStateField(StateModule.GENERAL)
   public static sortByMusicFile: string;
+
+  @ClassStateField(StateModule.GENERAL)
+  public static searchInterpret: string;
+
+  @ClassStateField(StateModule.GENERAL)
+  public static sortByInterpret: string;
 
   public static async getMusicFiles(): Promise<any> {
     const filter: IFilterMusicFile = AppStore.state.filterMusicFile;
@@ -24,7 +32,9 @@ export abstract class MusicFileRestClient {
   }
 
   public static async getInterprets(): Promise<any> {
-    return await axios.get(`${this.api}/interpret/sortBy=name/search=null`);
+    const searchInterpret = this.checkEmpty(this.searchInterpret);
+    const sortByInterpret = this.checkEmpty(this.sortByInterpret);
+    return await axios.get(`${this.api}/interpret/sortBy=${sortByInterpret}/search=${searchInterpret}`);
   }
 
   public static createMusicFile(musicFile: IMusicFile): Promise<any> {
@@ -48,8 +58,23 @@ export abstract class MusicFileRestClient {
     return axios.delete(`${this.api}/interpret/${id}`);
   }
 
+  public static updateInterpret(interpret: IInterpret): Promise<any> {
+    const id = interpret.ID;
+    return axios.put(`${this.api}/interpret/${id}`, { interpret });
+  }
+
+  public static createInterpret(interpret: IInterpret): Promise<any> {
+    return axios.post(`${this.api}/interpret`, { interpret });
+  }
+
   public static checkEmpty(txt: any) {
     if (txt === "" || txt === undefined) { return null; } else { return txt; }
   }
   private static api = config.apiEndpoint;
+
+  @ClassStateField(StateModule.GENERAL)
+  public searchInterpret: string;
+
+  @ClassStateField(StateModule.GENERAL)
+  public sortByInterpret: string;
 }
