@@ -205,8 +205,9 @@ namespace MusicStorageAPI.Controllers
                         System.Diagnostics.Debug.WriteLine(createdTitle.ID);
 
                         // if the interpret is not in the database, create a new interpret
+                        var existingInterpret = entites.Interpret.FirstOrDefault(i => i.NAME == musicFile.Interpret.Name);
                         Models.InterpretDTO createdInterpret = new Models.InterpretDTO { ID = musicFile.Interpret.ID, Name = musicFile.Interpret.Name };
-                        if (musicFile.Interpret.ID == -1)
+                        if (existingInterpret == null)
                         {
                             MusicFileDataAccess.Interpret interpret = new MusicFileDataAccess.Interpret();
                             interpret.NAME = musicFile.Interpret.Name;
