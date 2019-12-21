@@ -21,11 +21,16 @@ namespace MusicStorageAPI.Controllers
             {
                 //join the tables and return the object list
                 return (from musicFile in entites.MusicFile
-                        join interpret in entites.Interpret
+                    join interpret in entites.Interpret
                         on musicFile.Interpret equals interpret.ID
-                        join title in entites.Title
+                    join title in entites.Title
                         on musicFile.Title equals title.ID
-                        select new Models.MusicFileDTO { ID = musicFile.ID, Title = new Models.TitleDTO { ID = title.ID, Name = title.NAME }, Interpret = new Models.InterpretDTO { ID = interpret.ID, Name = interpret.NAME }, Genre = title.Genre }).ToList();
+                    select new Models.MusicFileDTO
+                    {
+                        ID = musicFile.ID, Title = new Models.TitleDTO {ID = title.ID, Name = title.NAME},
+                        Interpret = new Models.InterpretDTO {ID = interpret.ID, Name = interpret.NAME},
+                        Genre = title.Genre
+                    }).ToList();
             }
         }
 
@@ -36,13 +41,23 @@ namespace MusicStorageAPI.Controllers
             {
                 // join the list and return a specific music file by id
                 var join = (from musicFile in entites.MusicFile
-                            join interpret in entites.Interpret
-                            on musicFile.Interpret equals interpret.ID
-                            join title in entites.Title
-                            on musicFile.Title equals title.ID
-                            select new { ID = musicFile.ID, Title = new Models.TitleDTO { ID = title.ID, Name = title.NAME }, Interpret = new Models.InterpretDTO { ID = interpret.ID, Name = interpret.NAME }, Genre = title.Genre });
+                    join interpret in entites.Interpret
+                        on musicFile.Interpret equals interpret.ID
+                    join title in entites.Title
+                        on musicFile.Title equals title.ID
+                    select new
+                    {
+                        ID = musicFile.ID, Title = new Models.TitleDTO {ID = title.ID, Name = title.NAME},
+                        Interpret = new Models.InterpretDTO {ID = interpret.ID, Name = interpret.NAME},
+                        Genre = title.Genre
+                    });
                 return join.Select(
-                m => new Models.MusicFileDTO { ID = m.ID, Title = new Models.TitleDTO { ID = m.Title.ID, Name = m.Title.Name }, Interpret = new Models.InterpretDTO { ID = m.Interpret.ID, Name = m.Interpret.Name }, Genre = m.Genre }).SingleOrDefault(m => m.ID == id);
+                    m => new Models.MusicFileDTO
+                    {
+                        ID = m.ID, Title = new Models.TitleDTO {ID = m.Title.ID, Name = m.Title.Name},
+                        Interpret = new Models.InterpretDTO {ID = m.Interpret.ID, Name = m.Interpret.Name},
+                        Genre = m.Genre
+                    }).SingleOrDefault(m => m.ID == id);
             }
         }
 
@@ -53,25 +68,33 @@ namespace MusicStorageAPI.Controllers
             {
                 //join the tables
                 var join = (from musicFile in entites.MusicFile
-                            join interpret in entites.Interpret
-                            on musicFile.Interpret equals interpret.ID
-                            join title in entites.Title
-                            on musicFile.Title equals title.ID
-                            select new { ID = musicFile.ID, Title = new Models.TitleDTO { ID = title.ID, Name = title.NAME }, Interpret = new Models.InterpretDTO { ID = interpret.ID, Name = interpret.NAME }, Genre = title.Genre });
+                    join interpret in entites.Interpret
+                        on musicFile.Interpret equals interpret.ID
+                    join title in entites.Title
+                        on musicFile.Title equals title.ID
+                    select new
+                    {
+                        ID = musicFile.ID, Title = new Models.TitleDTO {ID = title.ID, Name = title.NAME},
+                        Interpret = new Models.InterpretDTO {ID = interpret.ID, Name = interpret.NAME},
+                        Genre = title.Genre
+                    });
                 if (search != "null")
                 {
                     // filter the results by the search
-                    var searchedInterprets = join.Where(i => i.Title.Name.Contains(search) || i.Interpret.Name.Contains(search) || i.Genre.Contains(search));
+                    var searchedInterprets = join.Where(i =>
+                        i.Title.Name.Contains(search) || i.Interpret.Name.Contains(search) || i.Genre.Contains(search));
                     // filter the results by the given interpret
                     if (interpretName != "null")
                     {
                         searchedInterprets = searchedInterprets.Where(i => i.Interpret.Name == interpretName);
                     }
+
                     // filter the results by the given genre
                     if (genreName != "null")
                     {
                         searchedInterprets = searchedInterprets.Where(i => i.Genre == genreName);
                     }
+
                     // order the results
                     var orderedInterprets = searchedInterprets.OrderBy(i => i.ID);
                     if (!(sortBy == "null"))
@@ -80,37 +103,52 @@ namespace MusicStorageAPI.Controllers
                         {
                             orderedInterprets = searchedInterprets.OrderBy(i => i.Interpret.Name);
                         }
+
                         if (sortBy == "-interpret")
                         {
                             orderedInterprets = searchedInterprets.OrderByDescending(i => i.Interpret.Name);
                         }
+
                         if (sortBy == "id")
                         {
                             orderedInterprets = searchedInterprets.OrderBy(i => i.ID);
                         }
+
                         if (sortBy == "-id")
                         {
                             orderedInterprets = searchedInterprets.OrderByDescending(i => i.ID);
                         }
+
                         if (sortBy == "title")
                         {
                             orderedInterprets = searchedInterprets.OrderBy(i => i.Title.Name);
                         }
+
                         if (sortBy == "-title")
                         {
                             orderedInterprets = searchedInterprets.OrderByDescending(i => i.Title.Name);
                         }
+
                         if (sortBy == "genre")
                         {
                             orderedInterprets = searchedInterprets.OrderBy(i => i.Genre);
                         }
+
                         if (sortBy == "-genre")
                         {
                             orderedInterprets = searchedInterprets.OrderByDescending(i => i.Genre);
                         }
                     }
+
                     return (from musicFile in orderedInterprets
-                            select new Models.MusicFileDTO { ID = musicFile.ID, Title = new Models.TitleDTO { ID = musicFile.Title.ID, Name = musicFile.Title.Name }, Interpret = new Models.InterpretDTO { ID = musicFile.Interpret.ID, Name = musicFile.Interpret.Name }, Genre = musicFile.Genre }).ToList();
+                        select new Models.MusicFileDTO
+                        {
+                            ID = musicFile.ID,
+                            Title = new Models.TitleDTO {ID = musicFile.Title.ID, Name = musicFile.Title.Name},
+                            Interpret = new Models.InterpretDTO
+                                {ID = musicFile.Interpret.ID, Name = musicFile.Interpret.Name},
+                            Genre = musicFile.Genre
+                        }).ToList();
                 }
                 else
                 {
@@ -120,10 +158,12 @@ namespace MusicStorageAPI.Controllers
                     {
                         searchedInterprets = searchedInterprets.Where(i => i.Interpret.Name == interpretName);
                     }
+
                     if (genreName != "null")
                     {
                         searchedInterprets = searchedInterprets.Where(i => i.Genre == genreName);
                     }
+
                     var orderedInterprets = searchedInterprets.OrderBy(i => i.ID);
                     if (!(sortBy == "null"))
                     {
@@ -131,37 +171,52 @@ namespace MusicStorageAPI.Controllers
                         {
                             orderedInterprets = searchedInterprets.OrderBy(i => i.Interpret.Name);
                         }
+
                         if (sortBy == "-interpret")
                         {
                             orderedInterprets = searchedInterprets.OrderByDescending(i => i.Interpret.Name);
                         }
+
                         if (sortBy == "id")
                         {
                             orderedInterprets = searchedInterprets.OrderBy(i => i.ID);
                         }
+
                         if (sortBy == "-id")
                         {
                             orderedInterprets = searchedInterprets.OrderByDescending(i => i.ID);
                         }
+
                         if (sortBy == "title")
                         {
                             orderedInterprets = searchedInterprets.OrderBy(i => i.Title.Name);
                         }
+
                         if (sortBy == "-title")
                         {
                             orderedInterprets = searchedInterprets.OrderByDescending(i => i.Title.Name);
                         }
+
                         if (sortBy == "genre")
                         {
                             orderedInterprets = searchedInterprets.OrderBy(i => i.Genre);
                         }
+
                         if (sortBy == "-genre")
                         {
                             orderedInterprets = searchedInterprets.OrderByDescending(i => i.Genre);
                         }
                     }
+
                     return (from musicFile in orderedInterprets
-                            select new Models.MusicFileDTO { ID = musicFile.ID, Title = new Models.TitleDTO { ID = musicFile.Title.ID, Name = musicFile.Title.Name }, Interpret = new Models.InterpretDTO { ID = musicFile.Interpret.ID, Name = musicFile.Interpret.Name }, Genre = musicFile.Genre }).ToList();
+                        select new Models.MusicFileDTO
+                        {
+                            ID = musicFile.ID,
+                            Title = new Models.TitleDTO {ID = musicFile.Title.ID, Name = musicFile.Title.Name},
+                            Interpret = new Models.InterpretDTO
+                                {ID = musicFile.Interpret.ID, Name = musicFile.Interpret.Name},
+                            Genre = musicFile.Genre
+                        }).ToList();
                 }
             }
         }
@@ -174,20 +229,28 @@ namespace MusicStorageAPI.Controllers
             {
                 using (MusicFileEntities entites = new MusicFileEntities())
                 {
-                    Models.MusicFileJson musicFile = new Models.MusicFileJson(Request.Content.ReadAsStringAsync().Result);
+                    Models.MusicFileJson musicFile =
+                        new Models.MusicFileJson(Request.Content.ReadAsStringAsync().Result);
                     // check if the genre is valid
-                    if (!(musicFile.Genre == "Pop" || musicFile.Genre == "Rock" || musicFile.Genre == "Dance" || musicFile.Genre == "Latin"))
+                    if (!(musicFile.Genre == "Pop" || musicFile.Genre == "Rock" || musicFile.Genre == "Dance" ||
+                          musicFile.Genre == "Latin"))
                     {
                         return Ok("Not a correct genre");
                     }
+
                     //System.Diagnostics.Debug.WriteLine(musicFile.Title.Name);
                     var join = (from m in entites.MusicFile
-                                join title in entites.Title
-                                on m.Title equals title.ID
-                                select new { ID = m.ID, Title = new Models.TitleDTO { ID = title.ID, Name = title.NAME }, Interpret = m.Interpret, Genre = title.Genre });
+                        join title in entites.Title
+                            on m.Title equals title.ID
+                        select new
+                        {
+                            ID = m.ID, Title = new Models.TitleDTO {ID = title.ID, Name = title.NAME},
+                            Interpret = m.Interpret, Genre = title.Genre
+                        });
 
                     // check if the title is already in the database 
-                    var element = join.FirstOrDefault(m => m.Title.Name == musicFile.Title.Name && m.Interpret == musicFile.Interpret.ID);
+                    var element = join.FirstOrDefault(m =>
+                        m.Title.Name == musicFile.Title.Name && m.Interpret == musicFile.Interpret.ID);
                     if (element == null)
                     {
                         //First Create the title
@@ -205,8 +268,10 @@ namespace MusicStorageAPI.Controllers
                         System.Diagnostics.Debug.WriteLine(createdTitle.ID);
 
                         // if the interpret is not in the database, create a new interpret
-                        var existingInterpret = entites.Interpret.FirstOrDefault(i => i.NAME == musicFile.Interpret.Name);
-                        Models.InterpretDTO createdInterpret = new Models.InterpretDTO { ID = musicFile.Interpret.ID, Name = musicFile.Interpret.Name };
+                        var existingInterpret =
+                            entites.Interpret.FirstOrDefault(i => i.NAME == musicFile.Interpret.Name);
+                        Models.InterpretDTO createdInterpret = new Models.InterpretDTO
+                            {ID = musicFile.Interpret.ID, Name = musicFile.Interpret.Name};
                         if (existingInterpret == null)
                         {
                             MusicFileDataAccess.Interpret interpret = new MusicFileDataAccess.Interpret();
@@ -220,6 +285,7 @@ namespace MusicStorageAPI.Controllers
                                 Name = i.NAME
                             }).SingleOrDefault(i => i.Name == musicFile.Interpret.Name);
                         }
+
                         System.Diagnostics.Debug.WriteLine(createdTitle.ID);
                         //in the last step create the music file
                         MusicFileDataAccess.MusicFile createdMusicFile = new MusicFileDataAccess.MusicFile();
@@ -230,7 +296,8 @@ namespace MusicStorageAPI.Controllers
 
                         // return success message
                         return Ok("Music file successfully created!");
-                    } else
+                    }
+                    else
                     {
                         return Ok("Element is already in the database");
                     }
@@ -282,31 +349,42 @@ namespace MusicStorageAPI.Controllers
             {
                 using (MusicFileEntities entites = new MusicFileEntities())
                 {
-                    Models.MusicFileJson musicFile = new Models.MusicFileJson(Request.Content.ReadAsStringAsync().Result);
+                    Models.MusicFileJson musicFile =
+                        new Models.MusicFileJson(Request.Content.ReadAsStringAsync().Result);
                     // check if the genre is valid
-                    if (!(musicFile.Genre == "Pop" || musicFile.Genre == "Rock" || musicFile.Genre == "Dance" || musicFile.Genre == "Latin"))
+                    if (!(musicFile.Genre == "Pop" || musicFile.Genre == "Rock" || musicFile.Genre == "Dance" ||
+                          musicFile.Genre == "Latin"))
                     {
                         return Ok("Not a correct genre");
                     }
+
                     var join = (from m in entites.MusicFile
-                                join title in entites.Title
-                                on m.Title equals title.ID
-                                select new { ID = m.ID, Title = new Models.TitleDTO { ID = title.ID, Name = title.NAME }, Interpret = m.Interpret, Genre = title.Genre });
+                        join title in entites.Title
+                            on m.Title equals title.ID
+                        select new
+                        {
+                            ID = m.ID, Title = new Models.TitleDTO {ID = title.ID, Name = title.NAME},
+                            Interpret = m.Interpret, Genre = title.Genre
+                        });
 
                     // check if the interpret already exists in the database
                     var preInterpret = entites.Interpret.FirstOrDefault(i => i.NAME == musicFile.Interpret.Name);
-                    Models.InterpretDTO createdInterpret = new Models.InterpretDTO { ID = 0, Name = "" };
+                    Models.InterpretDTO createdInterpret = new Models.InterpretDTO {ID = 0, Name = ""};
                     if (preInterpret != null)
                     {
                         createdInterpret.ID = preInterpret.ID;
                         createdInterpret.Name = preInterpret.NAME;
                         // check if the interpret already has a title named like the musicfile
-                        var tempTitle = join.FirstOrDefault(m => m.Interpret == createdInterpret.ID && m.Title.Name == musicFile.Title.Name && m.Title.ID != musicFile.Title.ID);
+                        var tempTitle = join.FirstOrDefault(m =>
+                            m.Interpret == createdInterpret.ID && m.Title.Name == musicFile.Title.Name &&
+                            m.Title.ID != musicFile.Title.ID);
                         if (tempTitle != null)
                         {
-                            return Ok("The interpret " + createdInterpret.Name + " has already a title named like " + musicFile.Title.Name);
+                            return Ok("The interpret " + createdInterpret.Name + " has already a title named like " +
+                                      musicFile.Title.Name);
                         }
-                    } else
+                    }
+                    else
                     {
                         //create new interpret
                         MusicFileDataAccess.Interpret interpret = new MusicFileDataAccess.Interpret();
@@ -320,6 +398,7 @@ namespace MusicStorageAPI.Controllers
                             Name = i.NAME
                         }).SingleOrDefault(i => i.Name == musicFile.Interpret.Name);
                     }
+
                     var existingTitle = entites.Title.FirstOrDefault(t => t.ID == musicFile.Title.ID);
                     if (existingTitle != null)
                     {
@@ -328,12 +407,13 @@ namespace MusicStorageAPI.Controllers
                         entites.SaveChanges();
 
                         var existingMusicFile = entites.MusicFile.FirstOrDefault(m => m.ID == musicFile.ID);
-                        
+
                         if (existingMusicFile != null)
                         {
                             existingMusicFile.Interpret = createdInterpret.ID;
                             entites.SaveChanges();
-                        } else
+                        }
+                        else
                         {
                             return NotFound();
                         }
